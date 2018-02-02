@@ -9,11 +9,15 @@ import re
 import json
 from bs4 import BeautifulSoup
 
+load_dotenv(find_dotenv())
 
 CYPRESS = "Cypress"
 WHISTLER = "Whistler - Blackomb"
+TWILIO_ACCOUNT_SID = os.environ.get("account_sid")
+TWILIO_AUTHENTIFICATION_TOKEN = os.environ.get("auth_token")
+MALCOLM_PHONE_NUMBER = os.environ.get("Malcolm_phone_nbr"),
+TWILIO_PHONE_NUMBER = os.environ.get("Twilio_phone_nbr")
 
-load_dotenv(find_dotenv())
 
 
 class Resort:
@@ -73,6 +77,7 @@ Cypress = Resort(name=CYPRESS,
 Whistler = Resort(name=WHISTLER,
                   info_url="https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx")
 
+<<<<<<< HEAD
 Cypress.info
 Whistler.info
 
@@ -94,3 +99,15 @@ print(datetime.now() - startTime)
 #     to=os.environ.get("Malcolm_phone_nbr"),
 #     from_=os.environ.get("Twilio_phone_nbr"),
 #     body="attempt with dotenv")
+=======
+text_message = Cypress.data + Whistler.data
+
+
+# Send text message
+client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTHENTIFICATION_TOKEN)
+
+client.api.account.messages.create(
+    to=MALCOLM_PHONE_NUMBER,
+    from_=TWILIO_PHONE_NUMBER,
+    body=text_message)
+>>>>>>> bf270fd... cosmetic
