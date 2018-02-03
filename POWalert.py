@@ -52,17 +52,13 @@ class Resort:
             self._12hsnow = (tab[5].split(' '))[0]
             self._24hsnow = (tab[6].split(' '))[0]
 
-    def discard_info(self):
+    @property
+    def info(self):
+        self.update()
         print(self.name+" report:")
         print(self._12hsnow+" overnight")
         print(self._24hsnow + " last 24h")
         print("*********")
-
-    @property
-    def data(self):
-        self.update()
-        str = self.name+" report:\n"+self._12hsnow+" overnight\n"+self._24hsnow + " last 24h\n"+"******************\n"
-        return str
 
 
 Cypress = Resort(name=CYPRESS,
@@ -73,14 +69,24 @@ Whistler = Resort(name=WHISTLER,
                   cam_url="",
                   info_url="https://www.pembertonvalleylodge.com/pemberton/snow-conditions/")
 
-text = Cypress.data + Whistler.data
+Cypress.info
+Whistler.info
 
-account_sid = os.environ.get("account_sid")
-auth_token = os.environ.get("auth_token")
+print(datetime.now() - startTime)
 
-client = Client(account_sid, auth_token)
+#with open('test.jpg', 'wb') as file:
+#    file.write(cypress)
 
-client.api.account.messages.create(
-    to=os.environ.get("Malcolm_phone_nbr"),
-    from_=os.environ.get("Twilio_phone_nbr"),
-    body=text)
+
+
+#
+# # Find these values at https://twilio.com/user/account
+# account_sid = os.environ.get("account_sid")
+# auth_token = os.environ.get("auth_token")
+#
+# client = Client(account_sid, auth_token)
+#
+# client.api.account.messages.create(
+#     to=os.environ.get("Malcolm_phone_nbr"),
+#     from_=os.environ.get("Twilio_phone_nbr"),
+#     body="attempt with dotenv")
