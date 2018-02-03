@@ -28,9 +28,6 @@ class Resort:
     def update(self):
         if self.webcam_url:
             self.webcam_img = io.imread(self.webcam_url)#, as_grey=True)
-            cv2.imshow('image1', self.webcam_img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
             parse_img.main(self.webcam_img)
 
         page = requests.get(self.info_url)
@@ -49,16 +46,12 @@ class Resort:
             self._24hsnow = data['TwentyFourHourSnowfall']['Centimeters']
             self._12hsnow = data['OvernightSnowfall']['Centimeters']
 
-    @property
-    def info(self):
-        self.update()
+    def discard_info(self):
         print(self.name+" report:")
         print(self._12hsnow+" cm overnight")
         print(self._24hsnow + " cm last 24h")
         print("*********")
 
-<<<<<<< HEAD
-=======
     @property
     def data(self):
         self.update()
@@ -67,7 +60,6 @@ class Resort:
                self._24hsnow + " cm last 24h\n" + \
                "******************\n"
 
->>>>>>> da05c82... from HTML scrapping to Json parsing
 
 Resort_list = {Resort(name=CYPRESS,
                       cam_url="http://snowstakecam.cypressmountain.com/axis-cgi/jpg/image.cgi?resolution=1024x768",
@@ -78,45 +70,10 @@ Resort_list = {Resort(name=CYPRESS,
 
                }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-Cypress.info
-Whistler.info
-
-print(datetime.now() - startTime)
-
-#with open('test.jpg', 'wb') as file:
-#    file.write(cypress)
-
-
-
-#
-# # Find these values at https://twilio.com/user/account
-# account_sid = os.environ.get("account_sid")
-# auth_token = os.environ.get("auth_token")
-#
-# client = Client(account_sid, auth_token)
-#
-# client.api.account.messages.create(
-#     to=os.environ.get("Malcolm_phone_nbr"),
-#     from_=os.environ.get("Twilio_phone_nbr"),
-#     body="attempt with dotenv")
-=======
-text_message = Cypress.data + Whistler.data
-=======
 txt_message = ""
 for resort in Resort_list:
     txt_message = txt_message + resort.data
->>>>>>> 39ec0db... Massive architecture changes
 
 send_text.main(txt_message)
 
 
-<<<<<<< HEAD
-client.api.account.messages.create(
-    to=MALCOLM_PHONE_NUMBER,
-    from_=TWILIO_PHONE_NUMBER,
-    body=text_message)
->>>>>>> bf270fd... cosmetic
-=======
->>>>>>> 39ec0db... Massive architecture changes
