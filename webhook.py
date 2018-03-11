@@ -64,7 +64,7 @@ def github_hook():
     data = json.loads(request.data)
     if data['events'] == 'pull_request':
         os.system("git pull")
-        os.system("service pow-alert restart")
+        os.system("service pow_alert restart")
 
 
 if __name__ == "__main__":
