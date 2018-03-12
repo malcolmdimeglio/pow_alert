@@ -61,10 +61,18 @@ def index():
 
 @app.route('/github', methods=['POST'])
 def github_hook():
-    data = json.loads(request.data)
-    if data['events'] == 'pull_request':
+    event = request.headers.get('X-GitHub-Event')
+    payload = json.loads(request.data)
+
+    if event == 'ping':
+        print(json.dumps(payload, indent=4))
+        return ''
+
+    if event == 'push':
         os.system("git pull")
         os.system("service pow_alert restart")
+    print("Out")
+    return ''
 
 
 if __name__ == "__main__":
