@@ -63,7 +63,7 @@ def index():
 def github_hook():
     event = request.headers.get('X-GitHub-Event')
     payload = json.loads(request.data)
-    with open('/log/githubHook.log','w') as file:
+    with open('log/githubHook.log','w') as file:
         file.write(f"X-GitHub-Event = {event}\n{json.dumps(payload, indent=4)}")
 
     if event == 'ping':
