@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 
-from pow_alert_malc import check_snow, pretify_data
+from pow_alert import check_snow, pretify_data
 import SQLitedb as sql
 from flask import Flask, request
 from flask_cors import CORS
