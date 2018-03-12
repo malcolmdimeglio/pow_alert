@@ -67,12 +67,12 @@ def github_hook():
         file.write(f"X-GitHub-Event = {event}\n{json.dumps(payload, indent=4)}")
 
     if event == 'ping':
-        return ''
+        return 'pong'
 
     if event == 'push':
         os.system("git pull")
         os.system("service pow_alert restart")
-    return ''
+    return 'Repository pulled'
 
 
 if __name__ == "__main__":
