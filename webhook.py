@@ -72,6 +72,13 @@ def github_hook():
 
     if event == 'push':
         subprocess.check_call(['/usr/bin/git', 'pull'], shell=False)
+
+        # NOTE: It looks like using a subprocess doesn't work for the following command. Either with shell True or False
+        # THOUGHT: restarting the main process with its own subprocess is not a good idea.
+        # it's seems like trying to bite the hand that feeds you
+        # os.system seems to use external process to restart the service and seems to be out of the main service scope.
+        # Being free of any service process os.system can thus restart one.
+        # To be confirmed!
         os.system("service pow_alert restart")
     return 'Repository pulled'
 
