@@ -37,6 +37,7 @@ class Resort:
             self._12hsnow = parse_img.read_height(image=self.webcam_img,
                                                   debug_option=PLOT_DEBUG,
                                                   resort=self.name)
+            io.imsave(f"log/CAM/{date}_{self.name.title()}_cam.png", self.webcam_img)
         page = requests.get(self.info_url)
         with open(f"log/HTML/{date}_{self.name.title()}.html", "w") as html_log_file:
             html_log_file.write(page.text)
@@ -148,9 +149,6 @@ if __name__ == "__main__":
             txt = f"{txt}\nSPECIAL NOTICE: {resort.data['info']}"
 
         txt = f"{txt}\n******************"
-
-        if resort.webcam_img is not None:
-            io.imsave(f"log/CAM/{date}_{resort.name.title()}_cam.png", resort.webcam_img)
 
         if resort._12hsnow and int(resort._12hsnow) > 0: # Mt Seymour doesnt have a 12h snow report
             fresh_snow = True
