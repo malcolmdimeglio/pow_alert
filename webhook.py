@@ -71,7 +71,7 @@ def github_hook():
 
     if event == 'push':
         os.system("git pull")
-        os.system("service pow_alert restart")
+        os.system("service pow_alert restart 2>> log/gunicorn.log")
     return 'Repository pulled'
 
 
