@@ -9,6 +9,7 @@ from flask.json import jsonify
 import notifications
 import json
 import subprocess
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -70,8 +71,8 @@ def github_hook():
         return 'pong'
 
     if event == 'push':
-        subprocess.check_call(['git', 'pull'], shell=False)
-        subprocess.check_call(['service', 'pow_alert'], shell=False)
+        subprocess.check_call(['/usr/bin/git', 'pull'], shell=False)
+        os.system("service pow_alert restart")
     return 'Repository pulled'
 
 
