@@ -116,8 +116,8 @@ def pretify_data(data):
             txt = f"{txt}\n{resort['24']}cm last 24h"
         if resort['info']:
             txt = f"{txt}\nSPECIAL NOTICE: {resort['info']}"
+        txt = f"{txt}\n******************"
 
-    txt = f"{txt}\n******************"
     return txt
 
 
@@ -136,9 +136,9 @@ if __name__ == "__main__":
 
         if resort.data['name'] == CYPRESS:
             if resort.data['12'] == "Trace":
-                resort.data['12'] = 0;
+                resort.data['12'] = 0
             if resort.data['24'] == "Trace":
-                resort.data['24'] = 0;
+                resort.data['24'] = 0
 
         if resort.data['12']:
             txt = f"{txt}\n{resort.data['12']}cm last 12h"
