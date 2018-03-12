@@ -73,13 +73,23 @@ def github_hook():
     if event == 'push':
         subprocess.check_call(['/usr/bin/git', 'pull'], shell=False)
 
-        # NOTE: It looks like using a subprocess doesn't work for the following command. Either with shell True or False
-        # THOUGHT: restarting the main process with its own subprocess is not a good idea.
-        # it's seems like trying to bite the hand that feeds you
-        # os.system seems to use external process to restart the service and seems to be out of the main service scope.
-        # Being free of any service process os.system can thus restart one.
-        # To be confirmed!
-        os.system("service pow_alert restart")
+        # NOTE: subprocess.check_call(['/bin/systemctl', 'restart', 'pow_alert'], shell=False)
+        # and subprocess.check_call(['/bin/systemctl restart pow_alert'], shell=True) work too.
+        # Meaning the process is properly restarted
+        # Although both of them raise an error :
+        # subprocess.CalledProcessError Command '['/bin/systemctl restart pow_alert']' died with <Signals.SIGTERM: 15>
+        # Since systemctl sends a SIGTERM signal to restart the process that is running this script, an error is raised
+        # metaphorically it's like trying to bite the hand that feeds you
+        # This could be solved with a try:except command
+        # Which one is better?
+        #
+        # try:
+        #     subprocess.check_call(['/bin/systemctl', 'restart', 'pow_alert'], shell=False)
+        # except subprocess.CalledProcessError:
+        #     pass
+
+
+        os.system("/bin/systemctl restart pow_alert")
     return 'Repository pulled'
 
 
