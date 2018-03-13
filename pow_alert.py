@@ -11,6 +11,7 @@ import parse_img
 from resort_names import *
 import SQLitedb as sql
 import time
+import make_cache as cache
 
 day = time.strftime("%d")
 month = time.strftime("%m")
@@ -106,9 +107,9 @@ def check_snow(resort_list_names=None):
     return result
 
 
-def pretify_data(data):
+def prettify_data(data_list_of_dict):
     txt = "**Snow Report**"
-    for resort in data:
+    for resort in data_list_of_dict:
         txt = f"{txt}\n{resort['name'].title()}:"
 
         if resort['name'] == CYPRESS:
@@ -137,29 +138,32 @@ if __name__ == "__main__":
     fresh_snow = False
     registered_numbers = sql.query_registered_numbers()
 
-    txt= "**Snow Report**"
-    for resort in resort_dict.values():
-        txt = f"{txt}\n{resort.data['name'].title()}:"
+    cache_resorts_list = cache.get_cache()
 
-        if resort.data['name'] == CYPRESS:
-            if resort.data['12'] == "Trace":
-                resort.data['12'] = 0
-            if resort.data['24'] == "Trace":
-                resort.data['24'] = 0
-
-        if resort.data['12']:
-            txt = f"{txt}\n{resort.data['12']}cm last 12h"
-        if resort.data['24']:
-            txt = f"{txt}\n{resort.data['24']}cm last 24h"
-        if resort.data['info']:
-            txt = f"{txt}\nSPECIAL NOTICE: {resort.data['info']}"
-
-        txt = f"{txt}\n******************"
-
-        if resort._12hsnow and int(resort._12hsnow) > 0: # Mt Seymour doesnt have a 12h snow report
+    # txt= "**Snow Report**"
+    # for resort in resort_dict.values():
+    #     txt = f"{txt}\n{resort.data['name'].title()}:"
+    #
+    #     if resort.data['name'] == CYPRESS:
+    #         if resort.data['12'] == "Trace":
+    #             resort.data['12'] = 0
+    #         if resort.data['24'] == "Trace":
+    #             resort.data['24'] = 0
+    #
+    #     if resort.data['12']:
+    #         txt = f"{txt}\n{resort.data['12']}cm last 12h"
+    #     if resort.data['24']:
+    #         txt = f"{txt}\n{resort.data['24']}cm last 24h"
+    #     if resort.data['info']:
+    #         txt = f"{txt}\nSPECIAL NOTICE: {resort.data['info']}"
+    #
+    #     txt = f"{txt}\n******************"
+    for resort in cache_resorts_list:
+        if resort['12'] and int(resort['12']) > 0: # Mt Seymour doesnt have a 12h snow report
             fresh_snow = True
 
     if fresh_snow:
+        txt = prettify_data(cache_resorts_list)
         for number in registered_numbers:
             notifications.send_sms(txt, number)
 
