@@ -111,6 +111,12 @@ def pretify_data(data):
     for resort in data:
         txt = f"{txt}\n{resort['name'].title()}:"
 
+        if resort['name'] == CYPRESS:
+            if resort['12'] == "Trace":
+                resort['12'] = 0
+            if resort['24'] == "Trace":
+                resort['24'] = 0
+
         if resort['12']:
             txt = f"{txt}\n{resort['12']}cm last 12h"
         if resort['24']:
