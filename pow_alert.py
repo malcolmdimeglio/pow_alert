@@ -64,7 +64,7 @@ class Resort:
         if div.text != "":
             self.extra_info = div.text
 
-    def update_seymour(self, page):
+    def update_mt_seymour(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
         all_td = soup.find_all('td')
         for td in all_td:
@@ -73,7 +73,7 @@ class Resort:
                 self._24hsnow = re.sub('[a-z]', '', fall)
                 break
 
-    def update_baker(self, page):
+    def update_mt_baker(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
         div = soup.find('div', class_='report-snowfall-value-12')
 
@@ -87,7 +87,7 @@ class Resort:
         snow = re.sub('[a-z]', '', snow)
         self._24hsnow = snow.split('″')[1].split('.')[0]
 
-    def update_cain(self, page):
+    def update_mt_cain(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
         all_p = soup.find_all('p')
         for p in all_p:
@@ -116,11 +116,11 @@ resort_dict = {
                     cam_url="http://snowstakecam.cypressmountain.com/axis-cgi/jpg/image.cgi?resolution=1024x768",
                     info_url="http://www.cypressmountain.com/downhill-conditions/"),
 
-    WHISTLER: Resort(name=WHISTLER,
-                     info_url="https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx"),
-
     SEYMOUR: Resort(name=SEYMOUR,
                     info_url="http://mtseymour.ca/conditions-hours-operation"),
+
+    WHISTLER: Resort(name=WHISTLER,
+                     info_url="https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx"),
 
     BAKER: Resort(name=BAKER,
                   info_url="http://www.mtbaker.us/snow-report"),
@@ -138,11 +138,10 @@ def check_snow(resort_list_names=None):
         result.append(resort_dict[name].data)
     return result
 
-
 def prettify_data(data_list_of_dict):
     txt = "**Snow Report**"
     for resort in data_list_of_dict:
-        txt = f"{txt}\n{resort['name'].title()}:"
+        txt = f"{txt}\n{re.sub('_', ' ', resort['name']).title()}:"
 
         if resort['name'] == CYPRESS:
             if resort['12'] == "Trace":
@@ -172,24 +171,6 @@ if __name__ == "__main__":
 
     cache_resorts_list = cache.get_cache()
 
-    # txt= "**Snow Report**"
-    # for resort in resort_dict.values():
-    #     txt = f"{txt}\n{resort.data['name'].title()}:"
-    #
-    #     if resort.data['name'] == CYPRESS:
-    #         if resort.data['12'] == "Trace":
-    #             resort.data['12'] = 0
-    #         if resort.data['24'] == "Trace":
-    #             resort.data['24'] = 0
-    #
-    #     if resort.data['12']:
-    #         txt = f"{txt}\n{resort.data['12']}cm last 12h"
-    #     if resort.data['24']:
-    #         txt = f"{txt}\n{resort.data['24']}cm last 24h"
-    #     if resort.data['info']:
-    #         txt = f"{txt}\nSPECIAL NOTICE: {resort.data['info']}"
-    #
-    #     txt = f"{txt}\n******************"
     for resort in cache_resorts_list:
         if resort['12'] and int(resort['12']) > 0: # Mt Seymour doesnt have a 12h snow report
             fresh_snow = True
