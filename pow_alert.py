@@ -87,6 +87,17 @@ class Resort:
         snow = re.sub('[a-z]', '', snow)
         self._24hsnow = snow.split('″')[1].split('.')[0]
 
+    def update_cain(self, page):
+        soup = BeautifulSoup(page.content, 'html.parser')
+        all_p = soup.find_all('p')
+        for p in all_p:
+            if "Overnight" in p.text:
+                snow = p.text.split(':')[1].split('-')[0].strip()
+                self._12hsnow = re.sub('[a-z]', '', snow)
+            if "24hrs" in p.text:
+                snow = p.text.split(':')[1].split('-')[0].strip()
+                self._24hsnow = re.sub('[a-z]', '', snow)
+
     def display_info(self):
         print(f"{self.name.tittle()} report:")
         print(f"{self._12hsnow} cm overnight")
@@ -113,6 +124,9 @@ resort_dict = {
 
     BAKER: Resort(name=BAKER,
                   info_url="http://www.mtbaker.us/snow-report"),
+
+    CAIN: Resort(name=CAIN,
+                 info_url="http://www.mountcain.com/pages/snowreport/cain_snowreport.cfm")
 
 }
 
