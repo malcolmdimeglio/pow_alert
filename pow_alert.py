@@ -73,6 +73,20 @@ class Resort:
                 self._24hsnow = re.sub('[a-z]', '', fall)
                 break
 
+    def update_baker(self, page):
+        soup = BeautifulSoup(page.content, 'html.parser')
+        div = soup.find('div', class_='report-snowfall-value-12')
+
+        # Syntax div.text: '\n3″\n7.62cm\n'
+        snow = re.sub('\n', '', div.text)
+        snow = re.sub('[a-z]','',snow)
+        self._12hsnow = snow.split('″')[1].split('.')[0]
+
+        div = soup.find('div', class_='report-snowfall-value-24')
+        snow = re.sub('\n', '', div.text)
+        snow = re.sub('[a-z]', '', snow)
+        self._24hsnow = snow.split('″')[1].split('.')[0]
+
     def display_info(self):
         print(f"{self.name.tittle()} report:")
         print(f"{self._12hsnow} cm overnight")
@@ -95,7 +109,11 @@ resort_dict = {
                      info_url="https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx"),
 
     SEYMOUR: Resort(name=SEYMOUR,
-                    info_url="http://mtseymour.ca/conditions-hours-operation")
+                    info_url="http://mtseymour.ca/conditions-hours-operation"),
+
+    BAKER: Resort(name=BAKER,
+                  info_url="http://www.mtbaker.us/snow-report"),
+
 }
 
 
