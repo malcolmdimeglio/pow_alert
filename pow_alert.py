@@ -66,8 +66,8 @@ class Resort:
 
     def update_seymour(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
-        tds = soup.find_all('td')
-        for td in tds:
+        all_td = soup.find_all('td')
+        for td in all_td:
             if "Last 24 hours" in td.text:
                 fall = td.text.split(' ')[3]
                 self._24hsnow = re.sub('[a-z]', '', fall)
