@@ -173,7 +173,7 @@ if __name__ == "__main__":
     except IndexError:
         PLOT_DEBUG = False
 
-    fresh_snow = True
+    fresh_snow = False
     registered_numbers = sql.query_registered_numbers()
 
     cache_resorts_list = cache.get()
