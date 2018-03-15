@@ -16,6 +16,7 @@ app = Flask(__name__)
 CORS(app)
 
 
+# This entry point is ran only if 'update' is called(texted) by any number
 def update(to_num):
     cache_resorts_list = cache.get()
     txt_message = prettify_data(cache_resorts_list)

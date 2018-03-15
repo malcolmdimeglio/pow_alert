@@ -23,7 +23,7 @@ PLOT_DEBUG = False
 
 class Resort:
 
-    def __init__(self, name, cam_url=None, info_url=None):
+    def __init__(self, name, local_resort, cam_url=None, info_url=None):
         self.name = name or "default"
         self.webcam_url = cam_url
         self.info_url = info_url
@@ -31,6 +31,7 @@ class Resort:
         self._24hsnow = ""
         self._12hsnow = ""
         self.extra_info = ""
+        self.local_resort = local_resort or False
 
     def update(self):
         if self.webcam_url:
@@ -108,25 +109,30 @@ class Resort:
     @property
     def data(self):
         self.update()
-        return {'name':self.name, '12':self._12hsnow, '24':self._24hsnow, 'info':self.extra_info}
+        return {'name':self.name, '12':self._12hsnow, '24':self._24hsnow, 'info':self.extra_info, 'local':self.local_resort}
 
 
 resort_dict = {
     CYPRESS: Resort(name=CYPRESS,
                     cam_url="http://snowstakecam.cypressmountain.com/axis-cgi/jpg/image.cgi?resolution=1024x768",
-                    info_url="http://www.cypressmountain.com/downhill-conditions/"),
+                    info_url="http://www.cypressmountain.com/downhill-conditions/",
+                    local_resort=True),
 
     SEYMOUR: Resort(name=SEYMOUR,
-                    info_url="http://mtseymour.ca/conditions-hours-operation"),
+                    info_url="http://mtseymour.ca/conditions-hours-operation",
+                    local_resort=True),
 
     WHISTLER: Resort(name=WHISTLER,
-                     info_url="https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx"),
+                     info_url="https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx",
+                     local_resort=True),
 
     BAKER: Resort(name=BAKER,
-                  info_url="http://www.mtbaker.us/snow-report"),
+                  info_url="http://www.mtbaker.us/snow-report",
+                  local_resort=False),
 
     CAIN: Resort(name=CAIN,
-                 info_url="http://www.mountcain.com/pages/snowreport/cain_snowreport.cfm")
+                 info_url="http://www.mountcain.com/pages/snowreport/cain_snowreport.cfm",
+                 local_resort=False)
 
 }
 
@@ -160,6 +166,7 @@ def prettify_data(data_list_of_dict):
     return txt
 
 
+# This entry point is ran only in the morning for registered numbers
 if __name__ == "__main__":
     try:
         PLOT_DEBUG = sys.argv[1]
@@ -170,6 +177,9 @@ if __name__ == "__main__":
     registered_numbers = sql.query_registered_numbers()
 
     cache_resorts_list = cache.get()
+
+    # pop out the non local resorts from the list
+    cache_resorts_list = [resort for resort in cache_resorts_list if resort['local']]
 
     for resort in cache_resorts_list:
         if resort['12'] and int(resort['12']) > 0: # Mt Seymour doesnt have a 12h snow report
