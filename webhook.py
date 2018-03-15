@@ -2,7 +2,7 @@
 
 
 from pow_alert import check_snow, prettify_data
-import make_cache as cache
+import cache
 import SQLitedb as sql
 from flask import Flask, request
 from flask_cors import CORS
@@ -17,7 +17,7 @@ CORS(app)
 
 
 def update(to_num):
-    cache_resorts_list = cache.get_cache()
+    cache_resorts_list = cache.get()
     txt_message = prettify_data(cache_resorts_list)
     notifications.send_sms(txt_message, to_num)
 
@@ -91,6 +91,7 @@ def github_hook():
 
 
         os.system("/bin/systemctl restart pow_alert")
+        cache.make()
     return 'Repository pulled'
 
 

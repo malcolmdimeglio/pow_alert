@@ -5,13 +5,13 @@ from flask.json import jsonify
 import json
 
 
-def create_cache():
+def make():
     result = pow_alert.check_snow()
     with open('report.cache', 'w') as file:
         file.write(json.dumps(result, indent=4))
 
 
-def get_cache():
+def get():
     try:
         with open('report.cache', 'r') as file:
             return json.load(file)
@@ -20,4 +20,4 @@ def get_cache():
 
 
 if __name__ == "__main__":
-    create_cache()
+    make()

@@ -11,7 +11,7 @@ import parse_img
 from resort_names import *
 import SQLitedb as sql
 import time
-import make_cache as cache
+import cache
 
 day = time.strftime("%d")
 month = time.strftime("%m")
@@ -166,10 +166,10 @@ if __name__ == "__main__":
     except IndexError:
         PLOT_DEBUG = False
 
-    fresh_snow = False
+    fresh_snow = True
     registered_numbers = sql.query_registered_numbers()
 
-    cache_resorts_list = cache.get_cache()
+    cache_resorts_list = cache.get()
 
     for resort in cache_resorts_list:
         if resort['12'] and int(resort['12']) > 0: # Mt Seymour doesnt have a 12h snow report
