@@ -150,9 +150,13 @@ def prettify_data(data_list_of_dict):
         txt = f"{txt}\n{re.sub('_', ' ', resort['name']).title()}:"
 
         if resort['name'] == CYPRESS:
-            if resort['12'] == "Trace":
+            try:
+                int(resort['12'])
+            except ValueError:  # Meaning the value can be 'Trace' or n/a etc.
                 resort['12'] = 0
-            if resort['24'] == "Trace":
+            try:
+                int(resort['24'])
+            except ValueError:  # Meaning the value can be 'Trace' or n/a etc.
                 resort['24'] = 0
 
         if resort['12']:
