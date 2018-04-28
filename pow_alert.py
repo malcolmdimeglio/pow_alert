@@ -18,7 +18,6 @@ month = time.strftime("%m")
 year = time.strftime("%Y")
 date = f"{year}_{month}_{day}"
 
-resort_names = [CYPRESS, WHISTLER]
 PLOT_DEBUG = False
 
 class Resort:
