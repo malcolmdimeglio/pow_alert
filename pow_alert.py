@@ -127,9 +127,9 @@ resort_dict = {
                      info_url="https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx",
                      local_resort=True),
 
-    BAKER: Resort(name=BAKER,
-                  info_url="http://www.mtbaker.us/snow-report",
-                  local_resort=False),
+    # BAKER: Resort(name=BAKER,
+    #               info_url="http://www.mtbaker.us/snow-report",
+    #               local_resort=False),
 
     CAIN: Resort(name=CAIN,
                  info_url="http://www.mountcain.com/pages/snowreport/cain_snowreport.cfm",
