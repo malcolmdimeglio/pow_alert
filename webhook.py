@@ -45,8 +45,8 @@ def handler():
         notifications.send_sms(txt, client_num)
     elif msg == "information":
         txt = f"Here are the keywords you can use:\n" \
-               "'update': you will receive the current status on the mountain.\n\n" \
-               "'register': you will be registered for morning texts if fresh snow on the local mountain.\n\n" \
+               "'update': you will receive the current status on all available mountains.\n\n" \
+               "'register': you will be registered for morning texts only if there is fresh snow on the local mountains.\n\n" \
                "'unregister': you will not receive morning texts anymore.\n\n" \
                "'information': lists all available keywords and their effect."
         notifications.send_sms(txt, client_num)
@@ -58,7 +58,7 @@ def handler():
     return ''  # Flask needs a return str
 
 @app.route('/json')
-def index():
+def json():
     result = check_snow()
     return jsonify(result)
 
@@ -90,10 +90,14 @@ def github_hook():
         # except subprocess.CalledProcessError:
         #     pass
 
-
         os.system("/bin/systemctl restart pow_alert")
         cache.make()
     return 'Repository pulled'
+
+
+@app.route('/index')
+def index():
+    return "<h1 style='color:blue'>Hello There!</h1>"
 
 
 if __name__ == "__main__":

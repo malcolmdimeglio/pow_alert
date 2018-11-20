@@ -101,7 +101,7 @@ class Resort:
                 self._24hsnow = re.sub('[a-z]', '', snow)
 
     def display_info(self):
-        print(f"{self.name.tittle()} report:")
+        print(f"{self.name.title()} report:")
         print(f"{self._12hsnow} cm overnight")
         print(f"{self._24hsnow} cm last 24h")
         print(f"Special resort info: {self.extra_info} ")
