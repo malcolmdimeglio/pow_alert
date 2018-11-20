@@ -54,15 +54,15 @@ class Resort:
 
     def update_cypress(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
-        all_div = soup.find_all('div', class_='weather-item clearfix')
+        all_div = soup.find_all('div', class_='flex_snowLocations')  # find 12h/24h/48h/7Days report
         for div in all_div:
-            if "24 hr Snow" in div.text:
-                el = div.find('span', class_='numbers')
-                self._24hsnow = el.text.split(' ')[0]
-                break
-        div = soup.find('div', class_='additional-info')
-        if div.text != "":
-            self.extra_info = div.text
+            for all_subdiv in div.findAll('div'):  # cut each report separately
+                if "24Hr" in all_subdiv.text:
+                    el = all_subdiv.find('span', class_='js-measurement')
+                    self._24hsnow = el.text
+                if "12Hr" in all_subdiv.text:
+                    el = all_subdiv.find('span', class_='js-measurement')
+                    self._12hsnow = el.text
 
     def update_mt_seymour(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -90,6 +90,8 @@ class Resort:
     def update_mt_cain(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
         all_p = soup.find_all('p')
+
+        # Syntax -> New Overnight: 0cm - 0in
         for p in all_p:
             if "Overnight" in p.text:
                 snow = p.text.split(':')[1].split('-')[0].strip()
@@ -114,7 +116,7 @@ class Resort:
 resort_dict = {
     CYPRESS: Resort(name=CYPRESS,
                     cam_url="http://snowstakecam.cypressmountain.com/axis-cgi/jpg/image.cgi?resolution=1024x768",
-                    info_url="http://www.cypressmountain.com/downhill-conditions/",
+                    info_url="http://www.cypressmountain.com/downhill-conditions-and-cams",
                     local_resort=True),
 
     SEYMOUR: Resort(name=SEYMOUR,
