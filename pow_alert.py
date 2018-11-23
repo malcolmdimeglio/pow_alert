@@ -29,6 +29,7 @@ class Resort:
         self.webcam_img = None
         self._24hsnow = ""
         self._12hsnow = ""
+        self.overnight_cam = ""
         self.extra_info = ""
         self.local_resort = local_resort or False
 
@@ -110,7 +111,12 @@ class Resort:
     @property
     def data(self):
         self.update()
-        return {'name':self.name, '12':self._12hsnow, '24':self._24hsnow, 'info':self.extra_info, 'local':self.local_resort}
+        return {'name':self.name,
+                '12':self._12hsnow,
+                '24':self._24hsnow,
+                'snowcam':self.overnight_cam,
+                'info':self.extra_info,
+                'local':self.local_resort}
 
 
 resort_dict = {
@@ -164,6 +170,8 @@ def prettify_data(data_list_of_dict):
             txt = f"{txt}\n{resort['12']}cm last 12h"
         if resort['24']:
             txt = f"{txt}\n{resort['24']}cm last 24h"
+        if resort['snowcam']:
+            txt = f"{txt}\n{resort['snowcam']}cm overnight"
         if resort['info']:
             txt = f"{txt}\nSPECIAL NOTICE: {resort['info']}"
         txt = f"{txt}\n******************"

@@ -54,6 +54,7 @@ def read_height(image, resort, debug_option=False):
 
         if os.environ.get("TOP_LEFT_OFFSET") is None:  # calibration has not been done, calibration is done once in a lifetime
             calibrate.cypress_img(debug_option)
+            load_dotenv(find_dotenv())
         # else no need to calibrate > already done
 
         img = image
