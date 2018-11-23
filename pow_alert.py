@@ -36,7 +36,7 @@ class Resort:
     def update(self):
         if self.webcam_url:
             self.webcam_img = io.imread(self.webcam_url)
-            self._12hsnow = parse_img.read_height(image=self.webcam_img,
+            self.overnight_cam = parse_img.read_height(image=self.webcam_img,
                                                   debug_option=PLOT_DEBUG,
                                                   resort=self.name)
             io.imsave(f"log/CAM/{date}_{self.name.title()}_cam.png", self.webcam_img)
@@ -61,9 +61,6 @@ class Resort:
                 if "24Hr" in all_subdiv.text:
                     el = all_subdiv.find('span', class_='js-measurement')
                     self._24hsnow = el.text
-                if "12Hr" in all_subdiv.text:
-                    el = all_subdiv.find('span', class_='js-measurement')
-                    self._12hsnow = el.text
 
     def update_mt_seymour(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -103,7 +100,8 @@ class Resort:
 
     def display_info(self):
         print(f"{self.name.title()} report:")
-        print(f"{self._12hsnow} cm overnight")
+        print(f"{self.snowcam} cm overnight")
+        print(f"{self._12hsnow} cm last 12h")
         print(f"{self._24hsnow} cm last 24h")
         print(f"Special resort info: {self.extra_info} ")
         print("******************")
@@ -166,12 +164,12 @@ def prettify_data(data_list_of_dict):
             except ValueError:  # Meaning the value can be 'Trace' or n/a etc.
                 resort['24'] = 0
 
+        if resort['snowcam']:
+            txt = f"{txt}\n{resort['snowcam']}cm overnight (snow cam)"
         if resort['12']:
             txt = f"{txt}\n{resort['12']}cm last 12h"
         if resort['24']:
             txt = f"{txt}\n{resort['24']}cm last 24h"
-        if resort['snowcam']:
-            txt = f"{txt}\n{resort['snowcam']}cm overnight"
         if resort['info']:
             txt = f"{txt}\nSPECIAL NOTICE: {resort['info']}"
         txt = f"{txt}\n******************"
