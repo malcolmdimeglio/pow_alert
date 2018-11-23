@@ -58,7 +58,7 @@ def handler():
     return ''  # Flask needs a return str
 
 @app.route('/json')
-def json():
+def json_info():
     result = check_snow()
     return jsonify(result)
 
