@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+import os
 import sys
 from skimage import io
 import requests
@@ -17,6 +18,8 @@ day = time.strftime("%d")
 month = time.strftime("%m")
 year = time.strftime("%Y")
 date = f"{year}_{month}_{day}"
+
+curr_dir = os.path.dirname(os.path.realpath(__file__))
 
 PLOT_DEBUG = False
 
@@ -39,9 +42,9 @@ class Resort:
             self.overnight_cam = parse_img.read_height(image=self.webcam_img,
                                                   debug_option=PLOT_DEBUG,
                                                   resort=self.name)
-            io.imsave(f"log/CAM/{date}_{self.name.title()}_cam.png", self.webcam_img)
+            io.imsave(f"{curr_dir}/log/CAM/{date}_{self.name.title()}_cam.png", self.webcam_img)
         page = requests.get(self.info_url)
-        with open(f"log/HTML/{date}_{self.name.title()}.html", "w") as html_log_file:
+        with open(f"{curr_dir}/log/HTML/{date}_{self.name.title()}.html", "w") as html_log_file:
             html_log_file.write(page.text)
 
         handler_fnc = getattr(self, f'update_{self.name}')

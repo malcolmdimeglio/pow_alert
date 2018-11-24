@@ -15,6 +15,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+curr_dir = os.path.dirname(os.path.realpath(__file__))
 
 # This entry point is ran only if 'update' is called(texted) by any number
 def update(to_num):
@@ -52,7 +53,7 @@ def handler():
         notifications.send_sms(txt, client_num)
     else:
         txt = f"Sorry buddy, the only keywords accepted are 'update', 'register' and 'unregister'.\n" \
-               "If it's your first time using the app, send 'information' for more insight on the keywords effects."
+               "If it's your first time using the app, send 'information'."
         notifications.send_sms(txt, client_num)
 
     return ''  # Flask needs a return str
@@ -66,7 +67,7 @@ def json_info():
 def github_hook():
     event = request.headers.get('X-GitHub-Event')
     payload = json.loads(request.data)
-    with open('log/githubHook.log','w') as file:
+    with open(f"{curr_dir}/log/githubHook.log",'w') as file:
         file.write(f"X-GitHub-Event = {event}\n{json.dumps(payload, indent=4)}")
 
     if event == 'ping':

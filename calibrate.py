@@ -8,6 +8,7 @@ from dotenv import load_dotenv, find_dotenv
 
 
 load_dotenv(find_dotenv())
+curr_dir = os.path.dirname(os.path.realpath(__file__))
 
 # All the 6 methods for comparison
 methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
@@ -16,10 +17,10 @@ methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
 
 def cypress_img(debug_option=False):
     # the following image will be used to calibrate the scale
-    img = cv2.imread('templates/SnowStake_Cypress_night0.jpg', 0)
+    img = cv2.imread(f"{curr_dir}/templates/SnowStake_Cypress_night0.jpg", 0)
     img2 = img.copy()
-    template1 = cv2.imread('templates/50.jpg', 0)
-    template2 = cv2.imread('templates/base.jpg', 0)
+    template1 = cv2.imread(f"{curr_dir}/templates/50.jpg", 0)
+    template2 = cv2.imread(f"{curr_dir}/templates/base.jpg", 0)
     template1 = cv2.resize(template1, (0, 0), fx=0.5, fy=0.5)
     template2 = cv2.resize(template2, (0, 0), fx=0.5, fy=0.5)
     h1, w1 = template1.shape
