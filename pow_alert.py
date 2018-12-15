@@ -58,12 +58,11 @@ class Resort:
 
     def update_cypress(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
-        all_div = soup.find_all('div', class_='flex_snowLocations')  # find 12h/24h/48h/7Days report
+        all_div = soup.find_all('div', class_='box')  # find 12h/24h/48h/7Days report
         for div in all_div:
-            for all_subdiv in div.findAll('div'):  # cut each report separately
-                if "24Hr" in all_subdiv.text:
-                    el = all_subdiv.find('span', class_='js-measurement')
-                    self._24hsnow = el.text
+            if "24Hr" in div.text and "cm" in div.text:
+                el = div.find('span', class_='js-measurement')
+                self._24hsnow = el.text
 
     def update_mt_seymour(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
