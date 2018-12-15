@@ -61,16 +61,16 @@ class Resort:
         all_div = soup.find_all('div', class_='box')  # find 12h/24h/48h/7Days report
         for div in all_div:
             if "24Hr" in div.text and "cm" in div.text:
-                el = div.find('span', class_='js-measurement')
-                self._24hsnow = el.text
+                snow = div.find('span', class_='js-measurement')
+                self._24hsnow = snow.text
 
     def update_mt_seymour(self, page):
         soup = BeautifulSoup(page.content, 'html.parser')
         all_td = soup.find_all('td')
         for td in all_td:
             if "Last 24 hours" in td.text:
-                fall = td.text.split(' ')[3]
-                self._24hsnow = re.sub('[a-z]', '', fall)
+                snow = td.text.split(' ')[3]
+                self._24hsnow = re.sub('[a-z]', '', snow)
                 break
 
     def update_mt_baker(self, page):
@@ -133,9 +133,9 @@ resort_dict = {
                      info_url="https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx",
                      local_resort=True),
 
-    # BAKER: Resort(name=BAKER,
-    #               info_url="http://www.mtbaker.us/snow-report",
-    #               local_resort=False),
+    BAKER: Resort(name=BAKER,
+                  info_url="http://www.mtbaker.us/snow-report",
+                  local_resort=False),
 
     CAIN: Resort(name=CAIN,
                  info_url="http://www.mountcain.com/pages/snowreport/cain_snowreport.cfm",
