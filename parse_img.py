@@ -8,9 +8,9 @@ from resort_names import *
 from dotenv import load_dotenv, find_dotenv
 
 Params = collections.namedtuple('Params', ['a', 'b', 'c'])  # to store equation of a line
-NBR_OF_THRESHOLD = 10
+NBR_OF_THRESHOLD = 9
 WHITE_THRESHOLD = 0.5 * 255
-LIST_OF_THRESHOLDS = ('50', '45', '40', '35', '30', '25', '20', '15', '10', '5', '0')
+LIST_OF_THRESHOLDS = ('45', '40', '35', '30', '25', '20', '15', '10', '5', '0')
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -62,7 +62,7 @@ def read_height(image, resort, debug_option=False):
         img = image
         img2 = img.copy()
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Otherwise the difference of encoding with cv2 and skimage will cause problems with matchTemplate
-        template1 = cv2.imread(f"{curr_dir}/templates/50.jpg", 0)
+        template1 = cv2.imread(f"{curr_dir}/templates/45.jpg", 0)
         template1 = cv2.resize(template1, None, fx=0.5, fy=0.5)  # MacOS grab.app changes resolution x2
         h1, w1 = template1.shape
         h, w = img.shape
