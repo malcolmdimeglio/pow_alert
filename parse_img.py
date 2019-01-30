@@ -102,7 +102,9 @@ def read_height(image, resort, debug_option=False):
             for i in range(NBR_OF_THRESHOLD):
                 if i > 4:  # black magic to counter difference of scale due to angle of camera
                     scale -= 1
-                if i > 7:
+                if i > 5:
+                    scale -= 0.5
+                if i > 6:
                     scale -= 0.5
                 cv2.line(img,
                          (5, int(_50_mark_line + i * scale)),
@@ -119,7 +121,9 @@ def read_height(image, resort, debug_option=False):
         for i in range(NBR_OF_THRESHOLD):
             if i > 4:  # black magic to counter the difference of scale due to angle of camera and may be also fish-eye
                 scale -= 1
-            if i > 7:
+            if i > 5:
+                scale -= 0.5
+            if i > 6:
                 scale -= 0.5
 
             threshold_points = ((0, int(_50_mark_line + i * scale)), (w-1, int(_50_mark_line + i * scale)))
