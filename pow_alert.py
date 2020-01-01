@@ -134,7 +134,7 @@ resort_dict = {
                      local_resort=True),
 
     BAKER: Resort(name=BAKER,
-                  info_url="http://www.mtbaker.us/snow-report",
+                  info_url="https://www.mtbaker.us/snow-report",
                   local_resort=False),
 
     CAIN: Resort(name=CAIN,
