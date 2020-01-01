@@ -126,17 +126,26 @@ def read_height(image, resort, debug_option=False):
 
         # extract points on both side of ROI where thresholds are
         threshold_points_list = list()
-        scale = thickness_scale
+        offset = 0
         for i in range(NBR_OF_THRESHOLD):
-            if i > 4:  # black magic to counter the difference of scale due to angle of camera and may be also fish-eye
-                scale -= 1
-            if i > 5:
-                scale -= 0.5
-            if i > 6:
-                scale -= 0.5
+            # black magic to counter the difference of scale due to angle of camera and may be also fish-eye
+            if i == 1:
+                offset = 16
+            if i == 2:
+                offset = 32
+            if i == 3:
+                offset = 43
+            if i == 4:
+                offset = 47
+            if i == 5:
+                offset = 50
+            if i == 6:
+                offset = 40
+            if i == 7:
+                offset = 30
 
-            threshold_points = ((0, int(_50_mark_line + i * scale)), (w-1, int(_50_mark_line + i * scale)))
-            threshold_line = calc_params((0, int(_50_mark_line + i * scale)), (w-1, int(_50_mark_line + i * scale)))
+            threshold_points = ((0, int(_50_mark_line + (i * thickness_scale) + offset)), (w-1, int(_50_mark_line + (i * thickness_scale) + offset)))
+            threshold_line = calc_params((0, int(_50_mark_line + (i * thickness_scale) + offset)), (w-1, int(_50_mark_line + (i * thickness_scale) + offset)))
 
             img_dbg = img if debug_option else None
             point_a = lines_intersection_pt(roi_left_line, threshold_line, threshold_points[0], threshold_points[1],
@@ -157,21 +166,28 @@ def read_height(image, resort, debug_option=False):
         # Extract ROI around threshold
         local_roi = list()
         for i in range(NBR_OF_THRESHOLD):
-            # the ROI ends halfway between the current threshold and the next. two last ROIs are identical size
+            # Let's say thick=
             if i < NBR_OF_THRESHOLD - 1:
+                offset = i * 2  # Black magic to change ROI size because of the angle of the camera
                 thick = abs(int((threshold_points_list[i][0][1] - threshold_points_list[i + 1][0][1]) / 2))
-            local_roi.append(img[int(threshold_points_list[i][0][1] - thick):int(threshold_points_list[i][1][1] + thick),
+            local_roi.append(img[int(threshold_points_list[i][0][1] - thick * (1/2)):int(threshold_points_list[i][1][1] + thick*(3/2) - offset),
                              threshold_points_list[i][0][0]:threshold_points_list[i][1][0]])
             if debug_option:
-                cv2.rectangle(img3, (threshold_points_list[i][0][0], int(threshold_points_list[i][0][1] - thick)),
-                              (threshold_points_list[i][1][0], int(threshold_points_list[i][1][1] + thick)), 255, 3)
+                cv2.rectangle(img3, (threshold_points_list[i][0][0], int(threshold_points_list[i][0][1] - thick* (2/4))),
+                              (threshold_points_list[i][1][0], int(threshold_points_list[i][1][1] + thick* (3/2) - offset)), 255, 3)
+
+        # Average value of pixels in the ROI
+        avg_pix_roi = [int(roi.mean()) for roi in local_roi[:NBR_OF_THRESHOLD]]
+
+        if debug_option:
+            print
+            for i, el in enumerate(avg_pix_roi):
+                print(f"ROI {LIST_OF_THRESHOLDS[i]}cm: {el}")
+
         if debug_option:
             plt.subplot(111), plt.imshow(img3, cmap='gray')
             plt.title('ROI'), plt.xticks([]), plt.yticks([])
             plt.show()
-
-        # Average value of pixels in the ROI
-        avg_pix_roi = [int(roi.mean()) for roi in local_roi[:NBR_OF_THRESHOLD]]
 
         # Now scale it for snow fall
         for threshold_val, white_val in zip(LIST_OF_THRESHOLDS, avg_pix_roi):
