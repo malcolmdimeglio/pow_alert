@@ -112,3 +112,6 @@ log/
 
 # Cache
 *.cache
+
+# MacOS
+.DS_Store
