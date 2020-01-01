@@ -8,9 +8,9 @@ from resort_names import *
 from dotenv import load_dotenv, find_dotenv
 
 Params = collections.namedtuple('Params', ['a', 'b', 'c'])  # to store equation of a line
-NBR_OF_THRESHOLD = 9
+NBR_OF_THRESHOLD = 8
 WHITE_THRESHOLD = 0.5 * 255
-LIST_OF_THRESHOLDS = ('45', '40', '35', '30', '25', '20', '15', '10', '5', '0')
+LIST_OF_THRESHOLDS = ('40', '35', '30', '25', '20', '15', '10', '5', '0')
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -62,7 +62,7 @@ def read_height(image, resort, debug_option=False):
         img = image
         img2 = img.copy()
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Otherwise the difference of encoding with cv2 and skimage will cause problems with matchTemplate
-        template1 = cv2.imread(f"{curr_dir}/templates/45.jpg", 0)
+        template1 = cv2.imread(f"{curr_dir}/templates/40.jpg", 0)
         template1 = cv2.resize(template1, None, fx=0.5, fy=0.5)  # MacOS grab.app changes resolution x2
         h1, w1 = template1.shape
         h, w = img.shape
@@ -91,24 +91,33 @@ def read_height(image, resort, debug_option=False):
 
         # Since the template is not perfectly centered we need an offset to align the center of the template and the line
         # with 9 here some kind of visual magic number as an correction offset (sorry)
-        thickness_scale = int(abs(_50_mark_line - _0_mark_line) / 10) + 9
+        thickness_scale = int(abs(_50_mark_line - _0_mark_line) / NBR_OF_THRESHOLD + 1)  # going from top to 0cm
 
         # Get the function of the 2 vertical ROI limits
         roi_left_line = calc_params(roi_top_left, roi_bottom_left)
         roi_right_line = calc_params(roi_top_right, roi_bottom_right)
 
         if debug_option:  # plots threshold lines
-            scale = thickness_scale
+            offset = 0
             for i in range(NBR_OF_THRESHOLD):
-                if i > 4:  # black magic to counter difference of scale due to angle of camera
-                    scale -= 1
-                if i > 5:
-                    scale -= 0.5
-                if i > 6:
-                    scale -= 0.5
+                # black magic to counter difference of scale due to angle of camera
+                if i == 1:
+                    offset = 16
+                if i == 2:
+                    offset = 32
+                if i == 3:
+                    offset = 43
+                if i == 4:
+                    offset = 47
+                if i == 5:
+                    offset = 50
+                if i == 6:
+                    offset = 40
+                if i == 7:
+                    offset = 30
                 cv2.line(img,
-                         (5, int(_50_mark_line + i * scale)),
-                         (1020, int(_50_mark_line + i * scale)),
+                         (5, int(_50_mark_line + (i * thickness_scale) + offset)),
+                         (1020, int(_50_mark_line + (i * thickness_scale) + offset)),
                          (255, 255, 255),
                          5)
             plt.subplot(111), plt.imshow(img, cmap='gray')

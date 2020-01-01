@@ -19,7 +19,7 @@ def cypress_img(debug_option=False):
     # the following image will be used to calibrate the scale
     img = cv2.imread(f"{curr_dir}/templates/SnowStake_Cypress_night0.jpg", 0)
     img2 = img.copy()
-    template1 = cv2.imread(f"{curr_dir}/templates/50.jpg", 0)
+    template1 = cv2.imread(f"{curr_dir}/templates/40.jpg", 0)
     template2 = cv2.imread(f"{curr_dir}/templates/base.jpg", 0)
     template1 = cv2.resize(template1, (0, 0), fx=0.5, fy=0.5)
     template2 = cv2.resize(template2, (0, 0), fx=0.5, fy=0.5)
