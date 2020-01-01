@@ -85,13 +85,13 @@ def read_height(image, resort, debug_option=False):
         roi_bottom_right = tuple(x + y for x, y in zip(top_left1, bottom_right_offset))
         roi_bottom_left = tuple(x + y for x, y in zip(top_left1, bottom_left_offset))
 
-        _50_mark_line = int((top_left1[1] + bottom_right1[1]) / 2)  # middle of the template (50cm) (y axis) Used as patient0
+        _top_mark_line = int((top_left1[1] + bottom_right1[1]) / 2)  # middle of the template (50cm) (y axis) Used as patient0
         _0_mark_line = roi_bottom_left[1]  # y axis on the ground
         # if we increase Y by thickness_scale, we get to the next threshold (5-10-15..50)
 
         # Since the template is not perfectly centered we need an offset to align the center of the template and the line
         # with 9 here some kind of visual magic number as an correction offset (sorry)
-        thickness_scale = int(abs(_50_mark_line - _0_mark_line) / NBR_OF_THRESHOLD + 1)  # going from top to 0cm
+        thickness_scale = int(abs(_top_mark_line - _0_mark_line) / NBR_OF_THRESHOLD + 1)  # going from top to 0cm
 
         # Get the function of the 2 vertical ROI limits
         roi_left_line = calc_params(roi_top_left, roi_bottom_left)
@@ -116,8 +116,8 @@ def read_height(image, resort, debug_option=False):
                 if i == 7:
                     offset = 30
                 cv2.line(img,
-                         (5, int(_50_mark_line + (i * thickness_scale) + offset)),
-                         (1020, int(_50_mark_line + (i * thickness_scale) + offset)),
+                         (5, int(_top_mark_line + (i * thickness_scale) + offset)),
+                         (1020, int(_top_mark_line + (i * thickness_scale) + offset)),
                          (255, 255, 255),
                          5)
             plt.subplot(111), plt.imshow(img, cmap='gray')
@@ -144,8 +144,8 @@ def read_height(image, resort, debug_option=False):
             if i == 7:
                 offset = 30
 
-            threshold_points = ((0, int(_50_mark_line + (i * thickness_scale) + offset)), (w-1, int(_50_mark_line + (i * thickness_scale) + offset)))
-            threshold_line = calc_params((0, int(_50_mark_line + (i * thickness_scale) + offset)), (w-1, int(_50_mark_line + (i * thickness_scale) + offset)))
+            threshold_points = ((0, int(_top_mark_line + (i * thickness_scale) + offset)), (w-1, int(_top_mark_line + (i * thickness_scale) + offset)))
+            threshold_line = calc_params((0, int(_top_mark_line + (i * thickness_scale) + offset)), (w-1, int(_top_mark_line + (i * thickness_scale) + offset)))
 
             img_dbg = img if debug_option else None
             point_a = lines_intersection_pt(roi_left_line, threshold_line, threshold_points[0], threshold_points[1],
@@ -170,10 +170,13 @@ def read_height(image, resort, debug_option=False):
             if i < NBR_OF_THRESHOLD - 1:
                 offset = i * 2  # Black magic to change ROI size because of the angle of the camera
                 thick = abs(int((threshold_points_list[i][0][1] - threshold_points_list[i + 1][0][1]) / 2))
+
+            # We want to apply a thickness slightly smaller on the way up, and slightly bigger on the way down (ratio 1/2:3/2), when creating the ROIs.
+            # We also need to apply an offset to counter the angle of the camera.
             local_roi.append(img[int(threshold_points_list[i][0][1] - thick * (1/2)):int(threshold_points_list[i][1][1] + thick*(3/2) - offset),
                              threshold_points_list[i][0][0]:threshold_points_list[i][1][0]])
             if debug_option:
-                cv2.rectangle(img3, (threshold_points_list[i][0][0], int(threshold_points_list[i][0][1] - thick* (2/4))),
+                cv2.rectangle(img3, (threshold_points_list[i][0][0], int(threshold_points_list[i][0][1] - thick* (1/2))),
                               (threshold_points_list[i][1][0], int(threshold_points_list[i][1][1] + thick* (3/2) - offset)), 255, 3)
 
         # Average value of pixels in the ROI
