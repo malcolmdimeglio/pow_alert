@@ -1,1 +1,1 @@
-web: gunicorn pow_alert.py:app
+web: gunicorn webhook:app
