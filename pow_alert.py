@@ -44,6 +44,11 @@ class Resort:
             io.imsave(f"{curr_dir}/log/CAM/{g_date}_{self.name.title()}_cam.png", self.webcam_img)
         page = requests.get(self.info_url)
 
+        if (page.status_code != 200):
+            self.extra_info = "N/A"
+            return
+
+        with open(f"{curr_dir}/log/HTML/{g_date}_{self.name.title()}.html", "w") as html_log_file:
             html_log_file.write(page.text)
 
         handler_fnc = getattr(self, f'update_{self.name}')
@@ -155,24 +160,27 @@ def prettify_data(data_list_of_dict):
     for resort in data_list_of_dict:
         txt = f"{txt}\n{re.sub('_', ' ', resort['name']).title()}:"
 
-        if resort['name'] == CYPRESS:
-            try:
-                int(resort['12'])
-            except ValueError:  # Meaning the value can be 'Trace' or n/a etc.
-                resort['12'] = 0
-            try:
-                int(resort['24'])
-            except ValueError:  # Meaning the value can be 'Trace' or n/a etc.
-                resort['24'] = 0
+        if resort['info'] == 'N/A':
+            txt = f"{txt}\nData Not Available"
+        else:
+            if resort['name'] == CYPRESS:
+                try:
+                    int(resort['12'])
+                except ValueError:  # Meaning the value can be 'Trace' or n/a etc.
+                    resort['12'] = 0
+                try:
+                    int(resort['24'])
+                except ValueError:  # Meaning the value can be 'Trace' or n/a etc.
+                    resort['24'] = 0
 
-        if resort['snowcam']:
-            txt = f"{txt}\n{resort['snowcam']}cm overnight (snow cam)"
-        if resort['12']:
-            txt = f"{txt}\n{resort['12']}cm last 12h"
-        if resort['24']:
-            txt = f"{txt}\n{resort['24']}cm last 24h"
-        if resort['info']:
-            txt = f"{txt}\nSPECIAL NOTICE: {resort['info']}"
+            if resort['snowcam']:
+                txt = f"{txt}\n{resort['snowcam']}cm overnight (snow cam)"
+            if resort['12']:
+                txt = f"{txt}\n{resort['12']}cm last 12h"
+            if resort['24']:
+                txt = f"{txt}\n{resort['24']}cm last 24h"
+            if resort['info']:
+                txt = f"{txt}\nSPECIAL NOTICE: {resort['info']}"
         txt = f"{txt}\n******************"
 
     return txt
