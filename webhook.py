@@ -35,7 +35,7 @@ def handler():
         update(client_num)
     elif msg == "register":
         txt = f"You will now receive updates in the morning if it snows overnight " \
-              f"on the Vancouver local mountains.\n" \
+              f"on the Vancouver, BC local mountains.\n" \
               f"You can stop it at any moment by sending 'unregister' to this number."
         notifications.send_sms(txt, client_num)
     elif msg == "unregister":
@@ -48,12 +48,12 @@ def handler():
         txt = f"Here are the keywords you can use:\n" \
                "'update': you will receive the current status on all available mountains.\n\n" \
                "'register': you will be registered for morning texts only if there is fresh snow on the local mountains.\n\n" \
-               "'unregister': you will not receive morning texts anymore.\n\n" \
-               "'information': lists all available keywords and their effect."
+               "'unregister': you will not receive morning texts anymore."
         notifications.send_sms(txt, client_num)
     else:
         txt = f"Sorry buddy, the only keywords accepted are 'update', 'register' and 'unregister'.\n" \
-               "If it's your first time using the app, send 'information'."
+               "If it's your first time using the app, send 'update' to see what's up.\n" \
+               "Otherwise sending 'information' will help you out."
         notifications.send_sms(txt, client_num)
 
     return ''  # Flask needs a return str
