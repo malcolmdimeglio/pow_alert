@@ -5,7 +5,7 @@ from dotenv import load_dotenv, find_dotenv
 import sqlite3
 
 load_dotenv(find_dotenv())
-DATABASE = os.environ.get("DATABASE_NAME")
+DATABASE = os.environ.get("DATABASE_NAME", "myDB.db")
 REGISTER = "register"
 UPDATE = "update"
 UNREGISTER = "unregister"
