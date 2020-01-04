@@ -13,6 +13,7 @@ from resort_names import *
 import SQLitedb as sql
 import time
 import cache
+from dotenv import load_dotenv, find_dotenv
 
 _date = time.strftime("%Y%m%d")
 _time = time.strftime("%H%M%S")
@@ -20,7 +21,8 @@ g_date = f"{_date}_{_time}"
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 
-PLOT_DEBUG = False
+load_dotenv(find_dotenv())
+PLOT_DEBUG = os.environ.get("DEBUG", False)
 
 class Resort:
 
@@ -188,11 +190,6 @@ def prettify_data(data_list_of_dict):
 
 # This entry point is ran only in the morning for registered numbers
 if __name__ == "__main__":
-    try:
-        PLOT_DEBUG = sys.argv[1]
-    except IndexError:
-        PLOT_DEBUG = False
-
     fresh_snow = False
     registered_numbers = sql.query_registered_numbers()
 
