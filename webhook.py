@@ -25,9 +25,13 @@ def update(to_num):
 
 @app.route('/')
 def handler():
+    log.debug("route: /")
     msg = request.args['Body'].lower().strip()
     client_num = request.args['From']
     # when using notifications.send_sms() method, remember that From and To args received are reversed when message sent
+
+    log.debug(f"Message received from {client_num}")
+    log.debug(f"Message: {msg}")
 
     sql.update_database(client_num, msg)
 
@@ -60,13 +64,18 @@ def handler():
 
 @app.route('/json')
 def json_info():
+    log.debug("route: /json")
     result = check_snow()
     return jsonify(result)
 
 @app.route('/github', methods=['POST'])
 def github_hook():
+    log.debug("route: /github")
+    log.debug(f"Received GitHub Event: {event}")
+
     event = request.headers.get('X-GitHub-Event')
     payload = json.loads(request.data)
+
     with open(f"{curr_dir}/log/githubHook.log",'w') as file:
         file.write(f"X-GitHub-Event = {event}\n{json.dumps(payload, indent=4)}")
 
@@ -74,6 +83,7 @@ def github_hook():
         return 'pong'
 
     if event == 'push':
+        log.debug(f"Pull repository from GitHub")
         subprocess.check_call(['/usr/bin/git', 'pull'], shell=False)
 
         # NOTE: subprocess.check_call(['/bin/systemctl', 'restart', 'pow_alert'], shell=False)
@@ -91,6 +101,7 @@ def github_hook():
         # except subprocess.CalledProcessError:
         #     pass
 
+        log.debug(f"Restart service")
         os.system("/bin/systemctl restart pow_alert")
         cache.make()
     return 'Repository pulled'
@@ -98,6 +109,7 @@ def github_hook():
 
 @app.route('/index')
 def index():
+    log.debug("route: /index")
     return "<h1 style='color:blue'>Hello There!</h1>"
 
 

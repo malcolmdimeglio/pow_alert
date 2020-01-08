@@ -3,6 +3,7 @@
 import os
 from dotenv import load_dotenv, find_dotenv
 import sqlite3
+from logger import *
 
 load_dotenv(find_dotenv())
 DATABASE = os.environ.get("DATABASE_NAME", "myDB.db")
@@ -19,6 +20,7 @@ connect.close()
 
 
 def add(phone_number, register):
+    log.debug(f"Add {phone_number} number to the DB")
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
@@ -29,6 +31,7 @@ def add(phone_number, register):
 
 
 def remove(phone_number):
+    log.debug(f"Remove {phone_number} from the DB")
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
@@ -39,6 +42,7 @@ def remove(phone_number):
 
 
 def in_database(phone_number):
+    log.debug(f"Check if {phone_number} in DB")
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     found = False
@@ -46,12 +50,16 @@ def in_database(phone_number):
     for row in c.execute("""SELECT number FROM Users"""):
         if phone_number in row:
             found = True
+            log.debug(f"{phone_number} found")
 
+    if not found:
+        log.debug(f"{phone_number} not found")
     conn.close()
     return found
 
 
 def updtate_register_col(phone_number, register):
+    log.debug(f"Update {phone_number} data. Register: {register}")
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
@@ -81,6 +89,7 @@ def update_database(phone_number, action):
 
 
 def query_registered_numbers():
+    log.debug(f"Querry all phone numbers from DB")
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     number_list = []

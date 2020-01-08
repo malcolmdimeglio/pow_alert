@@ -6,6 +6,7 @@ import calibrate
 import collections
 from resort_names import *
 from dotenv import load_dotenv, find_dotenv
+from logger import *
 
 Params = collections.namedtuple('Params', ['a', 'b', 'c'])  # to store equation of a line
 NBR_OF_THRESHOLD = 8
@@ -47,7 +48,7 @@ def lines_intersection_pt(params1, params2, point1, point2, img, dbg):
 
 
 def read_height(image, resort, debug_option=False):
-
+    log.debug(f"Read {resort} snow fall level off webacam footage")
     if debug_option:
         from matplotlib import pyplot as plt
 
@@ -63,10 +64,12 @@ def read_height(image, resort, debug_option=False):
         img2 = img.copy()
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Otherwise the difference of encoding with cv2 and skimage will cause problems with matchTemplate
         template1 = cv2.imread(f"{curr_dir}/templates/40.jpg", 0)
+        log.debug("Resize templates by a 1:2 factor to accomodate Apple grab tool effect")
         template1 = cv2.resize(template1, None, fx=0.5, fy=0.5)  # MacOS grab.app changes resolution x2
         h1, w1 = template1.shape
         h, w = img.shape
 
+        log.debug("Use TM_CCOEFF_NORMED method to find template ROI image coordinates on webcam image")
         method = eval('cv2.TM_CCOEFF_NORMED')
 
         res1 = cv2.matchTemplate(img, template1, method)
@@ -74,24 +77,33 @@ def read_height(image, resort, debug_option=False):
         top_left1 = max_loc1
         bottom_right1 = (top_left1[0] + w1, top_left1[1] + h1)
 
+        log.debug("Extract from .env file the offsets to apply to get the ROI 4 corners")
         top_left_offset = eval(str(os.environ.get("TOP_LEFT_OFFSET")))
         top_right_offset = eval(str(os.environ.get("TOP_RIGHT_OFFSET")))
         bottom_left_offset = eval(str(os.environ.get("BOTTOM_LEFT_OFFSET")))
         bottom_right_offset = eval(str(os.environ.get("BOTTOM_RIGHT_OFFSET")))
 
+        log.debug(f"TOP_LEFT_OFFSET={top_left_offset}")
+        log.debug(f"TOP_RIGHT_OFFSET={top_right_offset}")
+        log.debug(f"BOTTOM_LEFT_OFFSET={bottom_left_offset}")
+        log.debug(f"BOTTOM_RIGHT_OFFSET={bottom_right_offset}")
+
         # Get 4 corners of ROI
+        log.debug("Find all 4 (x,y) coordinates for main ROI:")
         roi_top_left = tuple(x + y for x, y in zip(top_left1, top_left_offset))
         roi_top_right = tuple(x + y for x, y in zip(top_left1, top_right_offset))
         roi_bottom_right = tuple(x + y for x, y in zip(top_left1, bottom_right_offset))
         roi_bottom_left = tuple(x + y for x, y in zip(top_left1, bottom_left_offset))
+        log.debug(f"{roi_top_left}, {roi_top_right}, {roi_bottom_right}, {roi_bottom_left}")
 
         _top_mark_line = int((top_left1[1] + bottom_right1[1]) / 2)  # middle of the template (50cm) (y axis) Used as patient0
         _0_mark_line = roi_bottom_left[1]  # y axis on the ground
-        # if we increase Y by thickness_scale, we get to the next threshold (5-10-15..50)
+        log.debug(f"Top mark line at: {_top_mark_line}")
+        log.debug(f"0 mark line at: {_0_mark_line}")
 
-        # Since the template is not perfectly centered we need an offset to align the center of the template and the line
-        # with 9 here some kind of visual magic number as an correction offset (sorry)
+        # if we increase Y by thickness_scale, we get to the next threshold (5-10-15..50)
         thickness_scale = int(abs(_top_mark_line - _0_mark_line) / NBR_OF_THRESHOLD + 1)  # going from top to 0cm
+        log.debug(f"Thickness between thresholds: {thickness_scale}")
 
         # Get the function of the 2 vertical ROI limits
         roi_left_line = calc_params(roi_top_left, roi_bottom_left)
@@ -154,6 +166,7 @@ def read_height(image, resort, debug_option=False):
                                             img_dbg, debug_option)
 
             threshold_points_list.append((point_a, point_b))
+            log.debug(f"Threshold points for {LIST_OF_THRESHOLDS[i]}cm: ({point_a},{point_b})")
 
         if debug_option:
             plt.subplot(111), plt.imshow(img, cmap='gray')
@@ -182,10 +195,9 @@ def read_height(image, resort, debug_option=False):
         # Average value of pixels in the ROI
         avg_pix_roi = [int(roi.mean()) for roi in local_roi[:NBR_OF_THRESHOLD]]
 
-        if debug_option:
-            print
-            for i, el in enumerate(avg_pix_roi):
-                print(f"ROI {LIST_OF_THRESHOLDS[i]}cm: {el}")
+        log.debug(f"White level threshold value: {WHITE_THRESHOLD}")
+        for i, el in enumerate(avg_pix_roi):
+            log.debug(f"ROI {LIST_OF_THRESHOLDS[i]}cm: white level: {el}")
 
         if debug_option:
             plt.subplot(111), plt.imshow(img3, cmap='gray')

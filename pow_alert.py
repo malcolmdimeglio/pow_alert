@@ -14,15 +14,19 @@ import SQLitedb as sql
 import time
 import cache
 from dotenv import load_dotenv, find_dotenv
+from logger import *
 
 _date = time.strftime("%Y%m%d")
 _time = time.strftime("%H%M%S")
 g_date = f"{_date}_{_time}"
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
+webcam_dir = f"{curr_dir}/log/CAM"
+webpage_dir = f"{curr_dir}/log/HTML"
 
 load_dotenv(find_dotenv())
 PLOT_DEBUG = os.environ.get("DEBUG", False)
+
 
 class Resort:
 
@@ -38,39 +42,50 @@ class Resort:
         self.local_resort = local_resort or False
 
     def update(self):
+        log.debug(f"Retrieve {self.name} data")
         if self.webcam_url:
+            log.debug(f"{self.name}: Webcam detected")
             self.webcam_img = io.imread(self.webcam_url)
             self.overnight_cam = parse_img.read_height(image=self.webcam_img,
                                                   debug_option=PLOT_DEBUG,
                                                   resort=self.name)
-            io.imsave(f"{curr_dir}/log/CAM/{g_date}_{self.name.title()}_cam.png", self.webcam_img)
+            webcam_name = f"{g_date}_{self.name.title()}_cam.png"
+            log.debug(f"{self.name}: Save webcam in {webcam_dir} as {webcam_name}")
+            io.imsave(f"{webcam_dir}/{webcam_name}", self.webcam_img)
         page = requests.get(self.info_url)
 
         if (page.status_code != 200):
             self.extra_info = "N/A"
             return
 
-        with open(f"{curr_dir}/log/HTML/{g_date}_{self.name.title()}.html", "w") as html_log_file:
+        webpage_name = (f"{g_date}_{self.name.title()}.html")
+        log.debug(f"{self.name}: Save HTML page in {webpage_dir} as {webpage_name}")
+        with open(f"{webpage_dir}/{webpage_name}", "w") as html_log_file:
             html_log_file.write(page.text)
 
         handler_fnc = getattr(self, f'update_{self.name}')
         return handler_fnc(page)
 
     def update_whistler(self, page):
+        log.debug(f"{self.name}: Parse website")
         text_json = re.search('FR.snowReportData = ({.*});', page.text)
         data = json.loads(text_json.groups()[0])
         self._24hsnow = data['TwentyFourHourSnowfall']['Centimeters']
         self._12hsnow = data['OvernightSnowfall']['Centimeters']
+        log.debug(f"{self.name}: Snow: {self._12hsnow}cm (12h)   {self._24hsnow}cm (24h)")
 
     def update_cypress(self, page):
+        log.debug(f"{self.name}: Parse website")
         soup = BeautifulSoup(page.content, 'html.parser')
         all_div = soup.find_all('div', class_='box')  # find 12h/24h/48h/7Days report
         for div in all_div:
             if "24Hr" in div.text and "cm" in div.text:
                 snow = div.find('span', class_='js-measurement')
                 self._24hsnow = snow.text
+        log.debug(f"{self.name}: Snow: {self._24hsnow}cm (24h)")
 
     def update_mt_seymour(self, page):
+        log.debug(f"{self.name}: Parse website")
         soup = BeautifulSoup(page.content, 'html.parser')
         all_td = soup.find_all('td')
         for td in all_td:
@@ -78,8 +93,10 @@ class Resort:
                 snow = td.text.split(' ')[3]
                 self._24hsnow = re.sub('[a-z]', '', snow)
                 break
+        log.debug(f"{self.name}: Snow: {self._24hsnow}cm (24h) (no 12h data)")
 
     def update_mt_baker(self, page):
+        log.debug(f"{self.name}: Parse website")
         soup = BeautifulSoup(page.content, 'html.parser')
         div = soup.find('div', class_='report-snowfall-value-12')
 
@@ -92,8 +109,10 @@ class Resort:
         snow = re.sub('\n', '', div.text)
         snow = re.sub('[a-z]', '', snow)
         self._24hsnow = snow.split('″')[1].split('.')[0]
+        log.debug(f"{self.name}: Snow: {self._12hsnow}cm (12h)   {self._24hsnow}cm (24h)")
 
     def update_mt_cain(self, page):
+        log.debug(f"{self.name}: Parse website")
         soup = BeautifulSoup(page.content, 'html.parser')
         all_p = soup.find_all('p')
 
@@ -105,6 +124,7 @@ class Resort:
             if "24hrs" in p.text:
                 snow = p.text.split(':')[1].split('-')[0].strip()
                 self._24hsnow = re.sub('[a-z]', '', snow)
+        log.debug(f"{self.name}: Snow: 12h:{self._12hsnow}cm   24h:{self._24hsnow}cm")
 
     def display_info(self):
         print(f"{self.name.title()} report:")
@@ -146,7 +166,6 @@ resort_dict = {
     CAIN: Resort(name=CAIN,
                  info_url="http://www.mountcain.com/pages/snowreport/cain_snowreport.cfm",
                  local_resort=False)
-
 }
 
 
