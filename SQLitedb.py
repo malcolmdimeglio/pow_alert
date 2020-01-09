@@ -19,12 +19,12 @@ connect.commit()  # Save (commit) the changes
 connect.close()
 
 
-def add(phone_number, register):
+def add(phone_number):
     log.debug(f"Add {phone_number} number to the DB")
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
-    c.execute("""INSERT INTO Users VALUES (NULL,?,?)""", (phone_number, register))
+    c.execute("""INSERT INTO Users VALUES (NULL,?,"no")""", (phone_number,))
 
     conn.commit()  # Save (commit) the changes
     conn.close()
@@ -74,11 +74,11 @@ def update_database(phone_number, action):
         if in_database(phone_number):
             updtate_register_col(phone_number, "yes")
         else:
-            add(phone_number, "yes")
+            add(phone_number)
 
     elif action == UPDATE:
         if not in_database(phone_number):
-            add(phone_number, "no")
+            add(phone_number)
 
     elif action == UNREGISTER:
         if in_database(phone_number):
