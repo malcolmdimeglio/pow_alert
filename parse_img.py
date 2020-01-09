@@ -9,9 +9,12 @@ from dotenv import load_dotenv, find_dotenv
 from logger import *
 
 Params = collections.namedtuple('Params', ['a', 'b', 'c'])  # to store equation of a line
-NBR_OF_THRESHOLD = 8
 WHITE_THRESHOLD = 0.5 * 255
 LIST_OF_THRESHOLDS = ('40', '35', '30', '25', '20', '15', '10', '5', '0')
+NBR_OF_THRESHOLD = len(LIST_OF_THRESHOLDS) - 1
+curr_dir = os.path.dirname(os.path.realpath(__file__))
+cypress_top_template_img = f"{curr_dir}/templates/40.jpg"
+cypress_base_template_img = f"{curr_dir}/templates/base.jpg"
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -63,7 +66,8 @@ def read_height(image, resort, debug_option=False):
         img = image
         img2 = img.copy()
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Otherwise the difference of encoding with cv2 and skimage will cause problems with matchTemplate
-        template1 = cv2.imread(f"{curr_dir}/templates/40.jpg", 0)
+        template1 = cv2.imread(cypress_top_template_img, 0)
+
         log.debug("Resize templates by a 1:2 factor to accomodate Apple grab tool effect")
         template1 = cv2.resize(template1, None, fx=0.5, fy=0.5)  # MacOS grab.app changes resolution x2
         h1, w1 = template1.shape
@@ -71,7 +75,6 @@ def read_height(image, resort, debug_option=False):
 
         log.debug("Use TM_CCOEFF_NORMED method to find template ROI image coordinates on webcam image")
         method = eval('cv2.TM_CCOEFF_NORMED')
-
         res1 = cv2.matchTemplate(img, template1, method)
         min_val1, max_val1, min_loc1, max_loc1 = cv2.minMaxLoc(res1)
         top_left1 = max_loc1
@@ -179,7 +182,6 @@ def read_height(image, resort, debug_option=False):
         # Extract ROI around threshold
         local_roi = list()
         for i in range(NBR_OF_THRESHOLD):
-            # Let's say thick=
             if i < NBR_OF_THRESHOLD - 1:
                 offset = i * 2  # Black magic to change ROI size because of the angle of the camera
                 thick = abs(int((threshold_points_list[i][0][1] - threshold_points_list[i + 1][0][1]) / 2))
@@ -188,6 +190,7 @@ def read_height(image, resort, debug_option=False):
             # We also need to apply an offset to counter the angle of the camera.
             local_roi.append(img[int(threshold_points_list[i][0][1] - thick * (1/2)):int(threshold_points_list[i][1][1] + thick*(3/2) - offset),
                              threshold_points_list[i][0][0]:threshold_points_list[i][1][0]])
+
             if debug_option:
                 cv2.rectangle(img3, (threshold_points_list[i][0][0], int(threshold_points_list[i][0][1] - thick* (1/2))),
                               (threshold_points_list[i][1][0], int(threshold_points_list[i][1][1] + thick* (3/2) - offset)), 255, 3)

@@ -58,7 +58,7 @@ def in_database(phone_number):
     return found
 
 
-def updtate_register_col(phone_number, register):
+def updtate_register_status(phone_number, register):
     log.debug(f"Update {phone_number} data. Register: {register}")
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -72,9 +72,10 @@ def updtate_register_col(phone_number, register):
 def update_database(phone_number, action):
     if action == REGISTER:
         if in_database(phone_number):
-            updtate_register_col(phone_number, "yes")
+            updtate_register_status(phone_number, "yes")
         else:
             add(phone_number)
+            updtate_register_status(phone_number, "yes")
 
     elif action == UPDATE:
         if not in_database(phone_number):
@@ -82,7 +83,7 @@ def update_database(phone_number, action):
 
     elif action == UNREGISTER:
         if in_database(phone_number):
-            updtate_register_col(phone_number, "no")
+            updtate_register_status(phone_number, "no")
 
     elif action == REMOVE:
         remove(phone_number)
