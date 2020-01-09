@@ -11,6 +11,7 @@ import notifications
 import json
 import subprocess
 import os
+from logger import *
 
 app = Flask(__name__)
 CORS(app)
